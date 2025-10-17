@@ -1,0 +1,15 @@
+{
+  "name": "csv-to-json",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "binary": "pkg --targets node18-linux-x64,node18-win-x64,node18-macos-x64 -o bin/csv-to-json index.js"
+  },
+  "keywords": [],
+  "author": "Aleksandr Sutulov",
+  "license": "ISC",
+  "description": "Tool to convert CSV to JSON via streams",
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  }
+}
