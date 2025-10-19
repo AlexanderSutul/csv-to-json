@@ -7,6 +7,7 @@ const readline = require("readline");
 const { getArgs, validateArgs } = require("./flags");
 const { reportMemory, help, printTotal, printFilePath } = require("./printers");
 const { createBenchmark } = require("./bench");
+const { autoTypeCast } = require("./cast-types");
 
 const args = getArgs();
 if (args.help) {
@@ -58,7 +59,7 @@ function appendLine(params) {
   for (let i = 0; i < iter.length; i++) {
     const key = hasHeader ? headers[i] : i;
     const value = values[i];
-    obj[key] = String(value);
+    obj[key] = autoTypeCast(value);
   }
   writer.write(JSON.stringify(obj));
 }
