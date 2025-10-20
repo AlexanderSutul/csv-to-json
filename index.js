@@ -30,7 +30,7 @@ const writer = fs.createWriteStream(outputPath, { encoding: "utf8" });
 
 const hasHeader = !args[NO_HEADERS];
 
-let headers = [];
+const headers = [];
 let lineCount = 0;
 
 const bench = createBenchmark();
