@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const readline = require("readline");
 
-const { getArgs, validateArgs } = require("./flags");
+const { getArgs, validateArgs, NO_HEADERS } = require("./flags");
 const { reportMemory, help, printTotal, printFilePath } = require("./printers");
 const { createBenchmark } = require("./bench");
 const { autoTypeCast } = require("./cast-types");
@@ -28,7 +28,7 @@ const rl = readline.createInterface({
 
 const writer = fs.createWriteStream(outputPath, { encoding: "utf8" });
 
-const hasHeader = args.headers;
+const hasHeader = !args[NO_HEADERS];
 
 let headers = [];
 let lineCount = 0;
@@ -39,7 +39,7 @@ bench.start();
 
 writer.write("[");
 
-const { delimiter = "," } = args;
+const { delimiter } = args;
 
 rl.on("line", (line) => {
   if (lineCount > (hasHeader ? 1 : 0)) writer.write(delimiter);

@@ -2,12 +2,14 @@
 
 const { parseArgs } = require("node:util");
 
+const NO_HEADERS = "no-headers";
+
 function getArgs() {
   const { values } = parseArgs({
     options: {
       input: { type: "string", short: "i" },
       output: { type: "string", short: "o" },
-      headers: { type: "boolean", short: "h" },
+      [NO_HEADERS]: { type: "boolean", short: "n" },
       verbose: { type: "boolean", short: "v" },
       delimiter: { type: "string", short: "v" },
       help: { type: "boolean" },
@@ -16,7 +18,14 @@ function getArgs() {
   return values;
 }
 
-function validateArgs({ input, output, headers, verbose, help, delimiter }) {
+function validateArgs({
+  input,
+  output,
+  [NO_HEADERS]: noHeaders,
+  verbose,
+  help,
+  delimiter,
+}) {
   if (!input) {
     throw new Error("Input file is required (--input or -i)");
   }
@@ -26,8 +35,8 @@ function validateArgs({ input, output, headers, verbose, help, delimiter }) {
   if (!delimiter) {
     throw new Error("Delimiter is required (--delimiter or -d)");
   }
-  if (headers !== undefined && typeof headers !== "boolean") {
-    throw new Error("Headers flag must be a boolean (--headers or -h)");
+  if (noHeaders !== undefined && typeof noHeaders !== "boolean") {
+    throw new Error("No headers flag must be a boolean (--no-headers or -n)");
   }
   if (verbose !== undefined && typeof verbose !== "boolean") {
     throw new Error("Verbose flag must be a boolean (--verbose or -v)");
@@ -37,4 +46,4 @@ function validateArgs({ input, output, headers, verbose, help, delimiter }) {
   }
 }
 
-module.exports = { getArgs, validateArgs };
+module.exports = { getArgs, validateArgs, NO_HEADERS };
