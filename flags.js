@@ -11,7 +11,7 @@ function getArgs() {
       output: { type: "string", short: "o" },
       [NO_HEADERS]: { type: "boolean", short: "n" },
       verbose: { type: "boolean", short: "v" },
-      delimiter: { type: "string", short: "v" },
+      delimiter: { type: "string", short: "d" },
       help: { type: "boolean" },
     },
   });
