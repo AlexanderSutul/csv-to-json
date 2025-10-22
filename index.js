@@ -39,22 +39,27 @@ const bench = createBenchmark();
 
 bench.start();
 
-writer.write("[");
+writer.write("[\n");
 
 const { delimiter } = args;
 
 rl.on("line", (line) => {
-  if (lineCount > (hasHeader ? 1 : 0)) writer.write(delimiter);
   if (hasHeader && lineCount === 0) {
     lineCount++;
     headers.push(...line.split(delimiter));
     return;
   }
-  appendLine(line);
+  const preparedLine = prepareLine(line);
+  const preparedDelimiter =
+    lineCount > (hasHeader ? 1 : 0) ? `${delimiter}\n` : "";
+  writer.write(`${preparedDelimiter}\t${preparedLine}`);
+
   lineCount++;
 });
 
-function appendLine(params) {
+function prepareLine(params = []) {
+  if (!params.length) return;
+
   const values = params.split(delimiter);
   const iter = hasHeader ? headers : values;
   let obj = {};
@@ -63,11 +68,11 @@ function appendLine(params) {
     const value = values[i];
     obj[key] = autoTypeCast(value);
   }
-  writer.write(JSON.stringify(obj));
+  return JSON.stringify(obj);
 }
 
 rl.on("close", () => {
-  writer.write("]\n");
+  writer.write("\n]\n");
   writer.end();
 
   if (args.verbose) {
