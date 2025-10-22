@@ -1,8 +1,4 @@
-#!/usr/bin/env node
-
 "use strict";
-
-const { pathToFileURL } = require("node:url");
 
 function printTotal(lineCount) {
   console.log(
@@ -47,6 +43,7 @@ function help() {
 }
 
 function printFilePath(path) {
+  const { pathToFileURL } = require("node:url");
   const url = pathToFileURL(path);
   console.log(`✅ File path: ${url}`);
 }
