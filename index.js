@@ -2,14 +2,13 @@
 
 "use strict";
 
-const fs = require("fs");
 const path = require("path");
-const readline = require("readline");
 
 const { getArgs, validateArgs, NO_HEADERS } = require("./flags");
 const { reportMemory, help, printTotal, printFilePath } = require("./printers");
 const { createBenchmark } = require("./bench");
-const { autoTypeCast } = require("./cast-types");
+const { LineProcessor } = require("./line-processor");
+const { FileProcessor } = require("./file-processor");
 
 const args = getArgs();
 if (args.help) {
@@ -19,77 +18,36 @@ if (args.help) {
 
 validateArgs(args);
 
-const inputPath = path.resolve(args.input);
-const outputPath = path.resolve(args.output);
-
-const reader = fs.createReadStream(inputPath, { encoding: "utf8" });
-const rl = readline.createInterface({
-  input: reader,
-  crlfDelay: Infinity,
-});
-
-const writer = fs.createWriteStream(outputPath, { encoding: "utf8" });
-
-const hasHeader = !args[NO_HEADERS];
-
-const headers = [];
-let lineCount = 0;
-
 const bench = createBenchmark();
 
-bench.start();
+const lineProcessor = new LineProcessor({ delimiter: args.delimiter });
 
-writer.write("[\n");
+const fileProcessorOptions = {
+  inputPath: path.resolve(args.input),
+  outputPath: path.resolve(args.output),
+  useHeaders: !args[NO_HEADERS],
+  delimiter: args.delimiter,
+};
 
-const { delimiter } = args;
+const onStart = () => {
+  bench.start();
+};
 
-rl.on("line", (line) => {
-  if (hasHeader && lineCount === 0) {
-    lineCount++;
-    headers.push(...line.split(delimiter));
-    return;
-  }
-  const preparedLine = prepareLine(line);
-  const preparedDelimiter =
-    lineCount > (hasHeader ? 1 : 0) ? `${delimiter}\n` : "";
-  writer.write(`${preparedDelimiter}\t${preparedLine}`);
-
-  lineCount++;
-});
-
-function prepareLine(params = []) {
-  if (!params.length) return;
-
-  const values = params.split(delimiter);
-  const iter = hasHeader ? headers : values;
-  let obj = {};
-  for (let i = 0; i < iter.length; i++) {
-    const key = hasHeader ? headers[i] : i;
-    const value = values[i];
-    obj[key] = autoTypeCast(value);
-  }
-  return JSON.stringify(obj);
-}
-
-rl.on("close", () => {
-  writer.write("\n]\n");
-  writer.end();
-
+const onFinish = ({ lineCounter }) => {
   if (args.verbose) {
     bench.end();
     reportMemory();
-    printTotal(lineCount);
+    printTotal(lineCounter);
   }
 
   printFilePath(args.output);
+};
+
+const fileProcessor = new FileProcessor({
+  lineProcessor,
+  onStart,
+  onFinish,
+  options: fileProcessorOptions,
 });
 
-reader.on("error", (err) => {
-  console.error("reader failed:", err);
-  rl.close();
-});
-
-writer.on("error", (err) => {
-  console.error("writer failed:", err);
-  rl.close();
-});
+fileProcessor.start();
