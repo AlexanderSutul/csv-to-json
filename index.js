@@ -9,6 +9,7 @@ const { reportMemory, help, printTotal, printFilePath } = require("./printers");
 const { createBenchmark } = require("./bench");
 const { LineProcessor } = require("./line-processor");
 const { FileProcessor } = require("./file-processor");
+const { Spinner } = require("./spinner");
 
 const args = getArgs();
 if (args.help) {
@@ -20,6 +21,9 @@ validateArgs(args);
 
 const bench = createBenchmark();
 
+let spinner;
+if (args.progress) spinner = new Spinner({ tickTime: 100 });
+
 const lineProcessor = new LineProcessor({ delimiter: args.delimiter });
 
 const fileProcessorOptions = {
@@ -30,10 +34,14 @@ const fileProcessorOptions = {
 };
 
 const onStart = () => {
+  spinner?.run();
+
   bench.start();
 };
 
 const onFinish = ({ lineCounter }) => {
+  spinner?.stop();
+
   if (args.verbose) {
     bench.end();
     reportMemory();

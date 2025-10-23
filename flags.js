@@ -12,6 +12,7 @@ function getArgs() {
       [NO_HEADERS]: { type: "boolean", short: "n" },
       verbose: { type: "boolean", short: "v" },
       delimiter: { type: "string", short: "d" },
+      progress: { type: "boolean", short: "p" },
       help: { type: "boolean" },
     },
   });
@@ -25,6 +26,7 @@ function validateArgs({
   verbose,
   help,
   delimiter,
+  progress,
 }) {
   if (!input) {
     throw new Error("Input file is required (--input or -i)");
@@ -40,6 +42,9 @@ function validateArgs({
   }
   if (verbose !== undefined && typeof verbose !== "boolean") {
     throw new Error("Verbose flag must be a boolean (--verbose or -v)");
+  }
+  if (progress !== undefined && typeof progress !== "boolean") {
+    throw new Error("Progress flag must be a boolean (--progress or -p)");
   }
   if (help !== undefined && typeof help !== "boolean") {
     throw new Error("Help flag must be a boolean (--help)");
